@@ -1,26 +1,18 @@
 import streamlit as st
 import random
 
-# 게임 목록
-games = [
-    "마인크래프트",
-    "리그 오브 레전드",
-    "발로란트",
-    "로블록스",
-    "오버워치 2",
-    "스타듀밸리",
-    "피파 온라인",
-    "배틀그라운드",
-    "젤다의 전설",
-    "에이펙스 레전드"
-]
+st.title("🎯 숫자 맞추기 게임")
 
-# 제목
-st.title("🎮 게임 추천 프로그램")
+# 정답 저장
+if "answer" not in st.session_state:
+    st.session_state.answer = random.randint(1, 10)
 
-st.write("버튼을 누르면 게임 하나를 추천해줌 ㅋㅋ")
+guess = st.number_input("1~10 숫자 입력", 1, 10)
 
-# 버튼
-if st.button("게임 추천받기"):
-    game = random.choice(games)
-    st.success(f"오늘 할 게임: {game}")
+if st.button("확인"):
+    if guess == st.session_state.answer:
+        st.success("정답이다 ㅋㅋ")
+    elif guess < st.session_state.answer:
+        st.warning("더 큰 숫자임")
+    else:
+        st.warning("더 작은 숫자임")
