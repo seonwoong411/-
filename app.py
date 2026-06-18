@@ -199,7 +199,7 @@ elif st.session_state.page == 'strategy':
     
     # 4분면 개념을 차용한 우선순위 추천 자동 기능 (차별화 포인트)
     st.subheader("🚀 시스템 추천 우선순위 가이드")
-    st.markdown("> **"중요도가 높고 마감이 임박한 과제"**부터 정렬하여 보여줍니다.")
+    st.markdown("> **'중요도가 높고 마감이 임박한 과제'**부터 정렬하여 보여줍니다.")
     
     if not st.session_state.tasks.empty:
         df = st.session_state.tasks.copy()
