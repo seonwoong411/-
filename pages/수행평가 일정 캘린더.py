@@ -1,6 +1,5 @@
-import streamlit as pd
 import streamlit as st
-from datetime import datetime, color
+from datetime import datetime, timedelta
 from streamlit_calendar import calendar
 
 # 1. 페이지 기본 설정 (와이드 모드로 화면을 크게 사용)
@@ -13,18 +12,22 @@ st.set_page_config(
 # 2. 세션 상태(Session State) 초기화 - 일정 데이터를 저장할 공간
 if "events" not in st.session_state:
     # 기본 예시 데이터 제공
+    # FullCalendar는 end 날짜를 '미포함'하므로, 당일 일정이면 end를 다음 날로 지정해야 달력에 채워집니다.
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    tomorrow_str = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
+    
     st.session_state["events"] = [
         {
             "title": "📑 수학 탐구 보고서 제출",
-            "start": datetime.now().strftime("%Y-%m-%d"),
-            "end": datetime.now().strftime("%Y-%m-%d"),
+            "start": today_str,
+            "end": tomorrow_str,
             "backgroundColor": "#FF6B6B",
             "borderColor": "#FF6B6B",
         },
         {
             "title": "🗣️ 영어 말하기 수행평가",
-            "start": datetime.now().strftime("%Y-%m-%d"),
-            "end": datetime.now().strftime("%Y-%m-%d"),
+            "start": today_str,
+            "end": tomorrow_str,
             "backgroundColor": "#4D96FF",
             "borderColor": "#4D96FF",
         }
@@ -50,7 +53,7 @@ with col_input:
         start_date = st.date_input("시작일", datetime.now())
         end_date = st.date_input("마감일(종료일)", datetime.now())
         
-        # 과목별 구분을 위한 색상 선택 (차별화 포인트)
+        # 과목별 구분을 위한 색상 선택
         color_todo = st.selectbox(
             "캘린더 표시 색상",
             ["빨간색 (급함)", "파란색 (여유)", "초록색 (제출완료)", "노란색 (준비중)"]
@@ -74,11 +77,15 @@ with col_input:
             elif start_date > end_date:
                 st.error("마감일은 시작일보다 빠를 수 없습니다.")
             else:
+                # 💡 FullCalendar 스펙 맞추기: 종료일 하루 더하기 (+1 day)
+                # 이렇게 해야 사용자가 선택한 '마감일' 당일까지 달력 막대가 꽉 차게 보입니다.
+                actual_end = end_date + timedelta(days=1)
+                
                 # 캘린더 라이브러리 형식에 맞게 데이터 추가
                 new_event = {
                     "title": f"📝 {subject}",
                     "start": start_date.strftime("%Y-%m-%d"),
-                    "end": end_date.strftime("%Y-%m-%d"),
+                    "end": actual_end.strftime("%Y-%m-%d"),
                     "backgroundColor": chosen_color,
                     "borderColor": chosen_color,
                 }
@@ -88,7 +95,7 @@ with col_input:
 
     st.markdown("---")
     
-    # 차별화 기능: 등록된 일정 목록 확인 및 전체 삭제 기능
+    # 등록된 일정 목록 확인 및 전체 삭제 기능
     st.subheader("🗑️ 일정 관리")
     if st.session_state["events"]:
         st.write(f"현재 등록된 총 일정: {len(st.session_state['events'])}개")
